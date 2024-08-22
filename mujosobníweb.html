@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moje Osobní Stránka</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            width: 100%;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #333;
+        }
+        nav a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+            display: block;
+        }
+        nav a:hover {
+            background-color: #575757;
+        }
+        section {
+            padding: 20px;
+            display: none; /* Skrytí všech sekcí */
+        }
+        .container {
+            width: 90%;
+            margin: auto;
+            overflow: hidden;
+            text-align: center; /* Centrovat obsah */
+        }
+        .editor-container {
+            display: flex;
+            gap: 20px;
+            flex-direction: row;
+            align-items: stretch;
+            height: 80vh; /* Výška kontejneru editoru a náhledu */
+        }
+        .editor-container > div {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        textarea {
+            width: 100%;
+            height: 100%; /* Výška editoru se přizpůsobí výšce kontejneru */
+            font-family: monospace;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: auto; /* Povolit posouvání, pokud je obsah delší */
+        }
+        iframe {
+            width: 100%;
+            height: 100%; /* Výška náhledu se přizpůsobí výšce kontejneru */
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .saved-codes {
+            margin-top: 20px;
+        }
+        .saved-code-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        .saved-code-item:hover {
+            background-color: #f0f0f0;
+        }
+        .saved-code-item h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        .gallery-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center; /* Centrovat obsah galerie */
+        }
+        .gallery-item {
+            width: calc(100% / 5 - 10px); /* 5 obrázků na řádek s mezerami */
+            height: auto;
+            cursor: pointer;
+            object-fit: cover;
+            position: relative;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .gallery-item.selected {
+            border: 2px solid #4CAF50;
+        }
+        .gallery-item .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #FF0000;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            display: none;
+        }
+        .gallery-item:hover .delete-btn {
+            display: block;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal img {
+            max-width: 90%;
+            max-height: 80%;
+            border-radius: 5px;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        .modal-controls {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        .modal-controls button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .modal-controls button:hover {
+            background-color: #45a049;
+        }
+        #links-list {
+            list-style-type: none;
+            padding: 0;
+            text-align: center; /* Centrovat seznam odkazů */
+        }
+        #links-list li {
+            margin: 10px 0;
+        }
+        #links-list a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        #links-list a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Vítejte na mé osobní stránce!</h1>
+    </header>
+    <nav>
+        <a href="#" onclick="showSection('about')">O mně</a>
+        <a href="#" onclick="showSection('portfolio')">Portfolio</a>
+        <a href="#" onclick="showSection('contacts')">Kontakty</a>
+        <a href="#" onclick="showSection('editor')">HTML Editor</a>
+        <a href="#" onclick="showSection('saved')">Moje HTML kódy</a>
+        <a href="#" onclick="showSection('gallery')">Galerie</a>
+        <a href="#" onclick="showSection('links')">Externí Odkazy</a>
+    </nav>
+    <section id="about">
+        <div class="container">
+            <h2>O mně</h2>
+            <p>Jmenuji se Jiří Med</p>
+            <p>Co rád dělám o volných chvílí</p>
+            <p>Rád hraju počítačové hry a sleduji YouTube videa</p>
+        </div>
+    </section>
+    <section id="portfolio">
+        <div class="container">
+            <h2>Portfolio</h2>
+            <p>Ukázky tvé práce nebo projektů. Můžeš zde přidat textové popisy nebo odkazy na další stránky.</p>
+        </div>
+    </section>
+    <section id="contacts">
+        <div class="container">
+            <h2>Kontakty</h2>
+            <p>Jak tě mohou lidé kontaktovat? Přidej sem e-mailovou adresu, telefonní číslo nebo odkazy na sociální sítě.</p>
+        </div>
+    </section>
+    <section id="editor">
+        <div class="container editor-container">
+            <div>
+                <h2>HTML Editor</h2>
+                <textarea id="html-editor" placeholder="Zde pište svůj HTML kód..."></textarea>
+                <button onclick="saveCode()">Uložit kód</button>
+            </div>
+            <div>
+                <iframe id="html-preview"></iframe>
+            </div>
+        </div>
+    </section>
+    <section id="saved">
+        <div class="container saved-codes">
+            <h2>Moje HTML kódy</h2>
+            <div id="saved-codes-list"></div>
+        </div>
+    </section>
+    <section id="gallery">
+        <div class="container">
+            <h2>Galerie</h2>
+            <input type="file" id="image-upload" multiple accept="image/*" onchange="handleImageUpload(event)">
+            <div id="gallery-container" class="gallery-container"></div>
+            <button id="delete-selected-btn" onclick="deleteSelectedImages()">Odstranit označené</button>
+        </div>
+    </section>
+    <section id="links">
+        <div class="container">
+            <h2>Externí Odkazy</h2>
+            <ul id="links-list">
+                <!-- Odkazy budou přidány zde -->
+            </ul>
+        </div>
+    </section>
+    <footer>
+        <p>&copy; 2024 Tvoje Jméno. Všechna práva vyhrazena.</p>
+    </footer>
+    <!-- Modal pro zvětšení obrázku -->
+    <div id="image-modal" class="modal">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <img id="modal-img" src="" alt="Zvětšený obrázek">
+        <div class="modal-controls">
+            <button onclick="changeImage(-1)">Předchozí</button>
+            <button onclick="changeImage(1)">Další</button>
+        </div>
+    </div>
+    <script>
+        function showSection(id) {
+            // Skrytí všech sekcí
+            const sections = document.querySelectorAll('section');
+            sections.forEach(section => section.style.display = 'none');
+            
+            // Zobrazení vybrané sekce
+            const selectedSection = document.getElementById(id);
+            if (selectedSection) {
+                selectedSection.style.display = 'block';
+            }
+        }
+
+        // Inicializace: zobrazit první sekci
+        showSection('about');
+
+        // HTML Editor
+        const editor = document.getElementById('html-editor');
+        const preview = document.getElementById('html-preview');
+        const savedCodesList = document.getElementById('saved-codes-list');
+
+        function updatePreview() {
+            const content = editor.value;
+            preview.srcdoc = content;
+        }
+
+        function saveCode() {
+            const code = editor.value;
+            const title = prompt("Zadejte název pro uložený kód:");
+            if (title) {
+                const codes = JSON.parse(localStorage.getItem('savedCodes')) || [];
+                codes.push({ title, code });
+                localStorage.setItem('savedCodes', JSON.stringify(codes));
+                loadSavedCodes();
+            }
+        }
+
+        function loadSavedCodes() {
+            const codes = JSON.parse(localStorage.getItem('savedCodes')) || [];
+            savedCodesList.innerHTML = '';
+            codes.forEach((item, index) => {
+                const codeItem = document.createElement('div');
+                codeItem.classList.add('saved-code-item');
+                codeItem.innerHTML = `<h3>${item.title}</h3>`;
+                codeItem.onclick = () => loadCodeToEditor(item.code);
+                savedCodesList.appendChild(codeItem);
+            });
+        }
+
+        function loadCodeToEditor(code) {
+            editor.value = code;
+            updatePreview();
+        }
+
+        editor.addEventListener('input', updatePreview);
+        updatePreview();  // Inicializace náhledu při prvním načtení
+        loadSavedCodes();  // Načtení uložených kódů při načtení stránky
+
+        // Galerie
+        const galleryContainer = document.getElementById('gallery-container');
+        const modal = document.getElementById('image-modal');
+        const modalImg = document.getElementById('modal-img');
+        let images = [];
+        let currentIndex = -1;
+
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('div');
+                        img.classList.add('gallery-item');
+                        img.innerHTML = `
+                            <img src="${e.target.result}" alt="Obrázek">
+                            <button class="delete-btn" onclick="removeImage(event)">x</button>
+                        `;
+                        img.onclick = () => openModal(images.indexOf(img));
+                        galleryContainer.appendChild(img);
+                        images.push(img);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+
+        function openModal(index) {
+            modal.style.display = 'flex';
+            modalImg.src = images[index].querySelector('img').src;
+            currentIndex = index;
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        function changeImage(direction) {
+            const newIndex = (currentIndex + direction + images.length) % images.length;
+            modalImg.src = images[newIndex].querySelector('img').src;
+            currentIndex = newIndex;
+        }
+
+        function removeImage(event) {
+            event.stopPropagation(); // Zabránit zavření modal
+            const imageElement = event.target.parentElement;
+            galleryContainer.removeChild(imageElement);
+            images = images.filter(img => img !== imageElement);
+        }
+
+        function deleteSelectedImages() {
+            const selectedImages = document.querySelectorAll('.gallery-item.selected');
+            selectedImages.forEach(img => {
+                galleryContainer.removeChild(img);
+                images = images.filter(image => image !== img);
+            });
+        }
+
+        galleryContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('gallery-item')) {
+                e.target.classList.toggle('selected');
+            }
+        });
+
+        // Přidání odkazů
+        function addLink(title, url) {
+            const linksList = document.getElementById('links-list');
+            const linkItem = document.createElement('li');
+            linkItem.innerHTML = `<a href="${url}" target="_blank">${title}</a>`;
+            linksList.appendChild(linkItem);
+        }
+
+        // Příklad použití funkce
+        addLink('Google', 'https://www.google.com');
+        addLink('GitHub', 'https://www.github.com');
+        addLink('MDN Web Docs', 'https://developer.mozilla.org');
+    </script>
+</body>
+</html>
